@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   AppstoreOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-  SettingOutlined,
   ShopOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Button, Dropdown, Input, Layout, Menu, message, Space } from "antd";
+import {   Input, Layout, Menu } from "antd";
 import { Outlet, useNavigate } from "react-router";
 import { getCurrentUserInfo, type UserData } from "../services/user.service";
-import { logoutUser } from "../services/auth.service";
+import HeaderComponent from "../components/layouts/main/HeaderComponent";
 
-const { Header, Content, Footer, Sider } = Layout;
+const {  Content, Footer, Sider } = Layout;
 
 const siderStyle: React.CSSProperties = {
   overflow: "auto",
@@ -27,7 +23,7 @@ const siderStyle: React.CSSProperties = {
 };
 
 const MainLayout: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
 
   const navigate = useNavigate();
@@ -42,61 +38,22 @@ const MainLayout: React.FC = () => {
       });
   }, []);
 
-  const handleUserDropdownMenuClick = ({ key }: { key: string }) => {
-    if(key==="logout"){
-      // Implement logout functionality here
-      const isLoggedOut = logoutUser();
-      if (isLoggedOut) {
-        navigate("/login");
-      }else{
-        console.error("Logout failed");
-        message.error("Logout failed. Please try again.");
-      }
-    }
+  
 
-  };
-
-  const dropdownItems: MenuProps["items"] = [
-    {
-      key: "my-account",
-      label: "My Account",
-      disabled: true,
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "profile",
-      label: "Profile",
-      extra: "⌘P",
-    },
-    {
-      key: "billing",
-      label: "Billing",
-      extra: "⌘B",
-    },
-    {
-      key: "settings",
-      label: "Settings",
-      icon: <SettingOutlined />,
-      extra: "⌘S",
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "logout",
-      label: "Logout",
-    },
-  ];
+  
 
   const menuItems: MenuProps["items"] = [
     {
       key: "dashboard",
       label: "Dashboard",
       icon: <AppstoreOutlined />,
+      onClick: () => navigate("/dashboard"),
     },
-    { key: "products", label: "Products", icon: <ShopOutlined /> },
+    { key: "products", 
+      label: "Products", 
+      icon: <ShopOutlined />, 
+      onClick: () => navigate("/products") 
+    },
   ];
 
   return (
@@ -117,47 +74,13 @@ const MainLayout: React.FC = () => {
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: "#fff" }}>
-          {/* You can add header content here if needed */}
-          <div className="flex justify-between items-center h-16">
-            <div>
-              <Button
-                onClick={() => {
-                  setCollapsed(!collapsed);
-                }}
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              />
-            </div>
-            <div>
-              <Input.Search placeholder="Search..." style={{ width: 400 }} />
-            </div>
-            <div>
-              <Dropdown
-                menu={{ items: dropdownItems, onClick: handleUserDropdownMenuClick }}
-                placement="bottom"
-                arrow
-                trigger={["click"]}
-              >
-                <a onClick={(e) => e.preventDefault()}>
-                  <Space>
-                    <span className="mr-4">
-                      {userData?.username || "Admin User"}
-                    </span>
-                    <UserOutlined
-                      style={{ fontSize: "20px", marginRight: "16px" }}
-                    />
-                  </Space>
-                </a>
-              </Dropdown>
-            </div>
-          </div>
-        </Header>
+        <HeaderComponent collapsed={collapsed} setCollapsed={setCollapsed} userData={userData} />
         <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
           <Outlet />
         </Content>
         <Footer style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+          
+          Xyz Commerce ©{new Date().getFullYear()} All rights reserved.
         </Footer>
       </Layout>
     </Layout>
