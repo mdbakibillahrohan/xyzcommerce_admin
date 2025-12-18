@@ -43,3 +43,6 @@ export const logoutUser = ():boolean=>{
     }
 }
 
+export const getLoggedInUserDetails = async():Promise<any>=>{
+    return await http.get("/auth/me");
+}
