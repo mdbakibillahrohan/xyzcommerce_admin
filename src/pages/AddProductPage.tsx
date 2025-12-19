@@ -1,12 +1,12 @@
 import { Button } from "antd";
 import { CopyOutlined, EyeOutlined } from "@ant-design/icons";
-import ProductInformationComponent from "../components/product/ProductInformationComponent";
-import PricingComponent from "../components/product/PricingComponent";
-import OrganizationComponent from "../components/product/OrganizationComponent";
-import MediaComponent from "../components/product/MediaComponent";
-import VariantsComponent from "../components/product/VariantsComponent";
+import ProductInformationComponent from "../components/addproduct/ProductInformationComponent";
+import PricingComponent from "../components/addproduct/PricingComponent";
+import OrganizationComponent from "../components/addproduct/OrganizationComponent";
+import MediaComponent from "../components/addproduct/MediaComponent";
+import VariantsComponent from "../components/addproduct/VariantsComponent";
 
-const ProductPage = () => {
+const AddProductPage = () => {
   return (
     <div className="m-2">
       {/* header */}
@@ -50,4 +50,4 @@ const ProductPage = () => {
     </div>
   );
 };
-export default ProductPage;
+export default AddProductPage;

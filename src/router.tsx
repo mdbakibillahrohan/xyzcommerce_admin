@@ -3,8 +3,8 @@ import LoginPage from "./pages/auth/login.page";
 import MainLayout from "./layout/MainLayout";
 import AuthGuardComponent from "./guards/AuthGuardComponent";
 import DashboardPage from "./pages/DashboardPage";
-import ProductPage from "./pages/ProductPage";
-
+import ProductListPage from "./pages/ProductListPage";
+import AddProductPage from "./pages/AddProductPage";
 
 const router = createBrowserRouter([
     {
@@ -21,7 +21,17 @@ const router = createBrowserRouter([
             },
             {
                 path: "/products",
-                element: <ProductPage/>
+               
+                children: [
+                    {
+                        path: "", 
+                        element: <ProductListPage />
+                    },
+                    {
+                        path: "add", 
+                        element: <AddProductPage /> 
+                    }
+                ]
             }
         ]
 
