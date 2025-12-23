@@ -5,6 +5,7 @@ import AuthGuardComponent from "./guards/AuthGuardComponent";
 import DashboardPage from "./pages/DashboardPage";
 import ProductListPage from "./pages/ProductListPage";
 import AddProductPage from "./pages/AddProductPage";
+import CategoryListPage from "./pages/category/CategoryListPage";
 
 const router = createBrowserRouter([
     {
@@ -21,7 +22,6 @@ const router = createBrowserRouter([
             },
             {
                 path: "/products",
-               
                 children: [
                     {
                         path: "", 
@@ -32,6 +32,10 @@ const router = createBrowserRouter([
                         element: <AddProductPage /> 
                     }
                 ]
+            },
+            {
+                path: "/categories",
+                element:<CategoryListPage/>
             }
         ]
 
