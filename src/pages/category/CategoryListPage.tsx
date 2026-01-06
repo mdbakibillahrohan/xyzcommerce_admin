@@ -49,6 +49,9 @@ const CategoryListPage = () => {
   ];
   const [categoryForm] = Form.useForm();
   const [data, setData] = useState<ICategory[]>([]);
+  const [categoryCount, setCategoryCount] = useState<number>(0);
+  const [currentPageNo, setCurrentPageNo] = useState<number>(1);
+  const [pageSize, setCurrentPageSize] = useState<number>(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   //category form handlers
@@ -80,8 +83,10 @@ const CategoryListPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await getCategories();
+      const offset = (pageSize * currentPageNo) - pageSize;
+      const response = await getCategories(null, offset, pageSize);
       setData(response.data?.categories || []);
+      setCategoryCount(response.data?.count || 0);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -89,7 +94,7 @@ const CategoryListPage = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [currentPageNo]);
 
   return (
     <div>
@@ -100,7 +105,22 @@ const CategoryListPage = () => {
           <Button onClick={() => setIsModalOpen(true)}>Add Category</Button>
         }
       >
-        <Table rowKey="category_id" columns={columns} dataSource={data} />
+        <Table 
+        rowKey="category_id" 
+        columns={columns} 
+        dataSource={data} 
+        pagination={{
+          pageSize: pageSize,
+          total: categoryCount,
+          onChange: (pageNo)=>{
+            setCurrentPageNo(pageNo)
+          },
+          onShowSizeChange: (pageSizeFromParam)=>{
+            setCurrentPageSize(pageSizeFromParam)
+          }
+        }}
+         />
+        
       </Card>
 
       {/* Add and edit category modal */}

@@ -1,8 +1,14 @@
 import http from "../config/http.config"
 import type { ICategory } from "../pages/category/CategoryListPage";
 
-export const getCategories = async () => {
-    return await http.get("/master/category");
+export const getCategories = async (searchText:string|null, offset:number, limit:number) => {
+    const urlParams = new URLSearchParams();
+    if(searchText){
+        urlParams.append("searchText",searchText)
+    }
+    urlParams.append("offset", offset.toString())
+    urlParams.append("limit", limit.toString())
+    return await http.get("/master/category", {params: urlParams});
 }
 
 export const createCategory = async (categoryData: ICategory) => {
