@@ -5,6 +5,7 @@ import {
   Card,
   Form,
   Input,
+  message,
   Modal,
   notification,
   Space,
@@ -12,7 +13,7 @@ import {
   type TableProps,
 } from "antd";
 import { useEffect, useState } from "react";
-import { createCategory, getCategories } from "../../services/category.service";
+import { createCategory, deleteCategoryService, getCategories, updateCategory } from "../../services/category.service";
 
 export interface ICategory {
   category_id: number;
@@ -37,10 +38,30 @@ const CategoryListPage = () => {
     {
       title: "Action",
       key: "action",
-      render: () => (
+      render: (_:any, record) => (
         <Space size="middle">
-          <Button type="link">Edit</Button>
-          <Button type="link" danger>
+          <Button onClick={()=>{
+            categoryForm.setFieldsValue(record)
+            setCategoryId(record?.category_id)
+            setIsEditing(true);
+            setIsModalOpen(true);
+          }} type="link">Edit</Button>
+          <Button onClick={()=>{
+            Modal.confirm({
+              title: "Are you sure you want to delete?",
+              okText: "Yes",
+              onOk: ()=>{
+                const showDeletingStatus = message.loading("Deleting....");
+                deleteCategoryService(record.category_id).then(()=>{
+                  fetchCategories();
+                }).catch(()=>{
+                  message.error("Something went wrong");
+                }).finally(()=>{
+                  showDeletingStatus();
+                })
+              }
+            })
+          }} type="link" danger>
             Delete
           </Button>
         </Space>
@@ -52,10 +73,34 @@ const CategoryListPage = () => {
   const [categoryCount, setCategoryCount] = useState<number>(0);
   const [currentPageNo, setCurrentPageNo] = useState<number>(1);
   const [pageSize, setCurrentPageSize] = useState<number>(10);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [categoryId, setCategoryId] = useState<number|null>(null);
 
   //category form handlers
   const onCategoryFormSubmit = (values: any) => {
+
+    const showMessageCreateOrUpdate = message.loading(isEditing?"Updating....":"Creating.....");
+
+    if(isEditing){
+      updateCategory(categoryId, values).then((response)=>{
+        console.log(response);
+        notification.success({
+          message: "Successfully update the category"
+        })
+        fetchCategories();
+        setIsModalOpen(false);
+      }).catch((err:any)=>{
+        console.log(err);
+        message.error("Something went wrong");
+      }).finally(()=>{
+        showMessageCreateOrUpdate();
+      })
+
+      return;
+    }
+
     createCategory(values)
       .then((response) => {
         console.log(response);
@@ -69,6 +114,8 @@ const CategoryListPage = () => {
       })
       .catch((error) => {
         console.error("Error creating category:", error);
+      }).finally(()=>{
+        showMessageCreateOrUpdate();
       });
   }
 
@@ -125,7 +172,7 @@ const CategoryListPage = () => {
 
       {/* Add and edit category modal */}
       <Modal
-        title="Add Category"
+        title={isEditing?"Edit Category":"Add Category"}
         closable={{ "aria-label": "Custom Close Button" }}
         open={isModalOpen}
         onOk={handleOk}

@@ -14,3 +14,11 @@ export const getCategories = async (searchText:string|null, offset:number, limit
 export const createCategory = async (categoryData: ICategory) => {
     return await http.post("/master/category", categoryData);
 }
+
+export const updateCategory = async(categoryId:number|null, categoryData:ICategory)=>{
+    return http.put("/master/category/"+categoryId, categoryData);
+}
+
+export const deleteCategoryService = async(categoryId:number)=>{
+    return http.delete("/master/category/"+categoryId);
+}
