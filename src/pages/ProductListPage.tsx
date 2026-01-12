@@ -1,12 +1,10 @@
 import { Card, Space } from "antd";
-import ProductListHeader from "../components/productlist/productListHeader";
+
 import ProductListTabs from "../components/productlist/ProductListTabs";
 import ProductListToolbar from "../components/productlist/ProductListToolbar";
 import ProductListTable from "../components/productlist/ProductListTable";
+import ProductListHeader from "../components/productlist/ProductListHeader";
 
-
-// import ProductToolbar from "./ProductToolbar";
-// import ProductsTable from "./ProductsTable";
 
 const ProductsPage = () => {
   return (

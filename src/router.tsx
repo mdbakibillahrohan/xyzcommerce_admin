@@ -6,6 +6,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ProductListPage from "./pages/ProductListPage";
 import AddProductPage from "./pages/AddProductPage";
 import CategoryListPage from "./pages/category/CategoryListPage";
+import CollectionListPage from "./pages/collection/CollectionListPage";
 
 const router = createBrowserRouter([
     {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
             {
                 path: "/categories",
                 element:<CategoryListPage/>
+            },
+            {
+                path: "/collections",
+                element:<CollectionListPage/>
             }
         ]
 
