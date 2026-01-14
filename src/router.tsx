@@ -7,6 +7,7 @@ import ProductListPage from "./pages/ProductListPage";
 import AddProductPage from "./pages/AddProductPage";
 import CategoryListPage from "./pages/category/CategoryListPage";
 import CollectionListPage from "./pages/collection/CollectionListPage";
+import VendorListPage from "./pages/vendor/vendorListPage";
 
 const router = createBrowserRouter([
     {
@@ -41,7 +42,12 @@ const router = createBrowserRouter([
             {
                 path: "/collections",
                 element:<CollectionListPage/>
+            },
+            {
+                path: "/vendors",
+                element:<VendorListPage/>
             }
+
         ]
 
     }

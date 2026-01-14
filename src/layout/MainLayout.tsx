@@ -63,7 +63,12 @@ const MainLayout: React.FC = () => {
       label: "Collections", 
       icon: <ShopOutlined />, 
       onClick: () => navigate("/collections") 
-    }
+    },
+    { key: "vendors", 
+      label: "Vendors", 
+      icon: <ShopOutlined />, 
+      onClick: () => navigate("/vendors") 
+    },
   ];
 
   return (
