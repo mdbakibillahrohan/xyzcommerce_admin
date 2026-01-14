@@ -54,7 +54,7 @@ const data = [
     sku: "2384741241",
     price: "$65",
     variants: 2,
-    image: "https://via.placeholder.com/48",
+    image: "http://localhost:3005/1768401906793-801474592.png",
   },
   {
     key: 2,
@@ -64,7 +64,7 @@ const data = [
     sku: "4124123847",
     price: "$21",
     variants: 4,
-    image: "https://via.placeholder.com/48",
+    image: "http://localhost:3005/1768401906793-801474592.png",
   },
 ];
 
