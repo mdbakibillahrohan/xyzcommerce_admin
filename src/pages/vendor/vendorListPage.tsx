@@ -104,7 +104,7 @@ const VendorListPage = () => {
     },
     {
       title: "Description",
-      dataIndex: "vendor_description",
+      dataIndex: "description",
       key: "vendor_description",
       ellipsis: true, 
     },
