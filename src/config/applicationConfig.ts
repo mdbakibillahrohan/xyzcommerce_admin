@@ -1,6 +1,7 @@
 
 const applicationConfig = {
-    API_BASE_URL: "http://localhost:3001/api"
+    API_BASE_URL: "http://localhost:3005/api",
+    FILE_BASE_URL: "http://localhost:3005"
 
 }
 

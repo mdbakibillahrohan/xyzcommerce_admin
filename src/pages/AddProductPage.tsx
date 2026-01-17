@@ -1,21 +1,31 @@
-import { Button, message } from "antd"; // message যোগ করা হয়েছে এলার্ট দেখানোর জন্য
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "antd"; // message যোগ করা হয়েছে এলার্ট দেখানোর জন্য
 import { CopyOutlined, EyeOutlined, SaveOutlined } from "@ant-design/icons"; // SaveOutlined আইকন
 import ProductInformationComponent from "../components/addproduct/ProductInformationComponent";
 import PricingComponent from "../components/addproduct/PricingComponent";
 import OrganizationComponent from "../components/addproduct/OrganizationComponent";
 import MediaComponent from "../components/addproduct/MediaComponent";
 import VariantsComponent from "../components/addproduct/VariantsComponent";
-import { useNavigate } from "react-router"; 
+import { useNavigate } from "react-router";
+import React, { useState } from "react";
 
 const AddProductPage = () => {
+  const [uploadedImagePath, setUploadedImagePath] = React.useState<
+    string | null
+  >(null);
+  const [price, setPrice] = useState<any>({
+    amount: 0,
+    currency: "BDT",
+  });
+
   const navigate = useNavigate();
 
-  
   const handleSave = () => {
+    // message.success("Product saved successfully!");
+
     
-    message.success("Product saved successfully!");
-    
-    navigate("/products"); 
+    console.log(uploadedImagePath, price);
+    navigate("/products");
   };
 
   return (
@@ -30,19 +40,21 @@ const AddProductPage = () => {
               </a>
               /Add Product
             </span>
-            <h1 className="text-2xl font-semibold text-gray-90 p-1">Add Product</h1>
+            <h1 className="text-2xl font-semibold text-gray-90 p-1">
+              Add Product
+            </h1>
           </div>
-          
+
           {/* button section */}
           <div className="flex gap-3 mt-2">
             <Button icon={<CopyOutlined />}>Duplicate</Button>
             <Button icon={<EyeOutlined />}>Preview</Button>
-            
-            <Button 
-              type="primary" 
-              icon={<SaveOutlined />} 
+
+            <Button
+              type="primary"
+              icon={<SaveOutlined />}
               onClick={handleSave}
-              style={{ backgroundColor: '#1677ff' }}
+              style={{ backgroundColor: "#1677ff" }}
             >
               Save Product
             </Button>
@@ -57,7 +69,10 @@ const AddProductPage = () => {
             <ProductInformationComponent />
           </div>
           <div className="mt-2">
-            <MediaComponent />
+            <MediaComponent
+              uploadedImagePath={uploadedImagePath}
+              setUploadedImagePath={setUploadedImagePath}
+            />
           </div>
           <div className="mt-2">
             <VariantsComponent />
@@ -66,7 +81,7 @@ const AddProductPage = () => {
 
         <div className="col-span-2 mt-3">
           <div>
-            <PricingComponent />
+            <PricingComponent price={price} setPrice={setPrice} />
           </div>
           <div className="pt-3.5">
             <OrganizationComponent />

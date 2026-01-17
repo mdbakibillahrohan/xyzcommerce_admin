@@ -8,6 +8,7 @@ import {   Input, Layout, Menu } from "antd";
 import { Outlet, useNavigate } from "react-router";
 import { getCurrentUserInfo, type UserData } from "../services/user.service";
 import HeaderComponent from "../components/layouts/main/HeaderComponent";
+import { logoutUser } from "../services/auth.service";
 
 const {  Content, Footer, Sider } = Layout;
 
@@ -34,6 +35,10 @@ const MainLayout: React.FC = () => {
         setUserData(data);
       })
       .catch((err) => {
+        if(err?.status===401){
+          logoutUser();
+          navigate("/login");
+        }
         console.error("Failed to fetch user data:", err);
       });
   }, []);
