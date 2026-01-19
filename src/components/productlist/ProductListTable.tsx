@@ -1,78 +1,64 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Table, Switch, Button, Space, Avatar } from "antd";
 import { EditOutlined, DownOutlined } from "@ant-design/icons";
-import type { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
 
 const columns = [
   {
     title: "PRODUCT",
-    dataIndex: "product",
-    render: (_: any, record: { image: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; product: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }) => (
+    dataIndex: "product_name", // ডাটাবেজে আপনি 'product_name' হিসেবে সেভ করছেন
+    key: "product_name",
+    render: (_: any, record: any) => {
+      // ইমেজের পূর্ণাঙ্গ ইউআরএল তৈরি করা
+      const imageUrl = record.image_path 
+        ? `http://localhost:3005/${record.image_path}` // আপনার ব্যাকএন্ড পোর্ট ও পাথ
+        : "https://via.placeholder.com/48"; // ইমেজ না থাকলে ডিফল্ট
+
+      return (
         <Space>
-            <Avatar shape="square" size={48} src={record.image} />
-            <strong>{record.product}</strong>
+          <Avatar shape="square" size={48} src={imageUrl} />
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <strong style={{ color: '#1677ff' }}>{record.product_name}</strong>
+            <small style={{ color: '#8c8c8c' }}>{record.category_name || 'No Category'}</small>
+          </div>
         </Space>
-    ),
-  },
-  {
-    title: "TYPE",
-    dataIndex: "type",
-  },
-  {
-    title: "STOCKS",
-    dataIndex: "stock",
-    render: (value: boolean | undefined) => <Switch defaultChecked={value} />,
+      );
+    },
   },
   {
     title: "SKU",
     dataIndex: "sku",
+    key: "sku",
+  },
+  {
+    title: "STOCKS",
+    dataIndex: "stock",
+    key: "stock",
+    render: (value: any) => <Switch checked={!!value} size="small" />,
   },
   {
     title: "PRICE",
     dataIndex: "price",
-  },
-  {
-    title: "VARIANTS",
-    dataIndex: "variants",
+    key: "price",
+    render: (value: any) => `৳${value}`, // কারেন্সি ফরম্যাট
   },
   {
     title: "ACTIONS",
+    key: "actions",
     render: () => (
-      <Button>
+      <Button size="small">
         <EditOutlined /> Edit <DownOutlined />
       </Button>
     ),
   },
 ];
 
-const data = [
-  {
-    key: 1,
-    product: "Photive wireless speakers",
-    type: "Electronics",
-    stock: true,
-    sku: "2384741241",
-    price: "$65",
-    variants: 2,
-    image: "http://localhost:3005/1768401906793-801474592.png",
-  },
-  {
-    key: 2,
-    product: "Topman shoe",
-    type: "Shoes",
-    stock: true,
-    sku: "4124123847",
-    price: "$21",
-    variants: 4,
-    image: "http://localhost:3005/1768401906793-801474592.png",
-  },
-];
-
-const ProductListTable = () => (
+const ProductListTable = ({ dataSource, loading }: any) => (
   <Table
     columns={columns}
-    dataSource={data}
-    pagination={false}
+    dataSource={dataSource} // ProductsPage থেকে আসা ডাটা
+    loading={loading}
+    pagination={{ pageSize: 10 }} // pagination={false} এর বদলে এটি ব্যবহার করা ভালো
+    rowKey="id" // ডাটাবেজের প্রাইমারি কি (ID)
   />
 );
 

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import{Card, Form,Input, Col,Select,InputNumber,Typography,Row,} from "antd"
 import { QuestionCircleOutlined } from "@ant-design/icons";
@@ -6,8 +8,8 @@ const { Text } = Typography;
 import { useState } from "react";
 import ReactQuill from 'react-quill-new'; 
 import 'react-quill-new/dist/quill.snow.css';
-const ProductInformationComponent = () => {
-    const [description, setDescription] = useState("");
+const ProductInformationComponent = ({setProductInfo}: any) => {
+    const [description, _setDescription] = useState("");
 
   const modules = {
     toolbar: [
@@ -17,6 +19,12 @@ const ProductInformationComponent = () => {
       [{ list: "ordered" }, { list: "bullet" }], // lists
     ],
   };
+const handleChange = (name: string, value: any) => {
+    setProductInfo((prev: any) => ({
+      ...prev,
+      [name]: value
+    }));
+  };  
   return <div>
       <Card>
         <h3 style={{ marginBottom: 24, fontWeight: 600 }}>
@@ -31,11 +39,13 @@ const ProductInformationComponent = () => {
             </>
           }
           >
-            <Input placeholder="Tiro track jacket" />
+            <Input placeholder="Tiro track jacket" 
+            onChange={(e) => handleChange('name', e.target.value)}
+            />
         </Form.Item>
          <Row gutter={16}><Col span={12}>
             <Form.Item label="SKU" name="sku">
-              <Input placeholder="eg. 348121032" />
+              <Input placeholder="eg. 348121032" onChange={(e) => handleChange('sku', e.target.value)} />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -44,8 +54,9 @@ const ProductInformationComponent = () => {
                 min={0}
                 style={{ width: "100%" }}
                 placeholder="0.0"
+                onChange={(value) => handleChange('weight', value)}
                 addonAfter={
-                  <Select defaultValue="kg">
+                  <Select defaultValue="kg" onChange={(value) => handleChange('weightUnit', value)}>
                     <Select.Option value="kg">kg</Select.Option>
                     <Select.Option value="g">g</Select.Option>
                     <Select.Option value="lb">lb</Select.Option>
@@ -65,14 +76,12 @@ const ProductInformationComponent = () => {
             <ReactQuill
               theme="snow"
               value={description}
-              onChange={setDescription}
               modules={modules}
               placeholder="Type your description..."
               style={{ height: "250px" }} // height set korlam
+              onChange={(content) => handleChange('description', content)}
             />
           </Form.Item>
-   
-
         </Form>
       </Card>
   </div>

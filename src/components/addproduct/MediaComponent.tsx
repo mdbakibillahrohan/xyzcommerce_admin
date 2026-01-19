@@ -3,7 +3,6 @@ import { InboxOutlined } from "@ant-design/icons";
 import type { UploadProps } from "antd";
 import { message, Upload, Card, Image } from "antd";
 import applicationConfig from "../../config/applicationConfig";
-import React from "react";
 const MediaComponent = ({ uploadedImagePath, setUploadedImagePath }:any) => {
   const props: UploadProps = {
     name: "file",

@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "antd"; // message যোগ করা হয়েছে এলার্ট দেখানোর জন্য
 import { CopyOutlined, EyeOutlined, SaveOutlined } from "@ant-design/icons"; // SaveOutlined আইকন
@@ -8,6 +9,8 @@ import MediaComponent from "../components/addproduct/MediaComponent";
 import VariantsComponent from "../components/addproduct/VariantsComponent";
 import { useNavigate } from "react-router";
 import React, { useState } from "react";
+import { message } from "antd";
+import { createProduct } from "../services/product.service";
 
 const AddProductPage = () => {
   const [uploadedImagePath, setUploadedImagePath] = React.useState<
@@ -17,16 +20,56 @@ const AddProductPage = () => {
     amount: 0,
     currency: "BDT",
   });
+  const [productInfo, setProductInfo] = useState({
+     name: '',
+      sku: '',
+       weight: '',
+        product_descriptions: '' });
+  const [organization, setOrganization] = useState({
+  vendor: null,
+  category: null,
+  collections: []
+});
 
   const navigate = useNavigate();
 
-  const handleSave = () => {
-    // message.success("Product saved successfully!");
+const handleSave = async () => {
 
-    
-    console.log(uploadedImagePath, price);
-    navigate("/products");
+  const finalData = {
+    productInfo: {
+      name: productInfo.name,
+      sku: productInfo.sku,
+      weight: Number(productInfo.weight) || 0,  
+      product_descriptions: productInfo.product_descriptions || '',
+    },
+    price: {
+      amount: Number(price.amount) || 0,
+      currency: price.currency || "BDT",
+    },
+    organization: {
+      vendor: organization.vendor ? Number(organization.vendor) : null,
+      category: Number(organization.category), 
+      collections: organization.collections || []
+    },
+    uploadedImagePath: uploadedImagePath || null
   };
+
+  try {
+  
+    const response = await createProduct(finalData); 
+    
+    // backend a theke success data chek
+    if (response.data?.success || response.status === 201) {
+      message.success("Product saved successfully!");
+      navigate("/products");
+    }
+  } catch (error: any) {
+    
+    console.error("Save error details:", error.response?.data);
+    const errorMessage = error.response?.data?.message || "Failed to save product";
+    message.error(errorMessage);
+  }
+};
 
   return (
     <div className="m-2">
@@ -66,7 +109,10 @@ const AddProductPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
         <div className="col-span-4 mt-3">
           <div>
-            <ProductInformationComponent />
+            <ProductInformationComponent 
+            productInfo={productInfo}
+            setProductInfo={setProductInfo}
+            />
           </div>
           <div className="mt-2">
             <MediaComponent
@@ -84,7 +130,11 @@ const AddProductPage = () => {
             <PricingComponent price={price} setPrice={setPrice} />
           </div>
           <div className="pt-3.5">
-            <OrganizationComponent />
+            <OrganizationComponent
+             organization={organization}
+             setOrganization={setOrganization}
+             
+            />
           </div>
         </div>
       </div>

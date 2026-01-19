@@ -71,7 +71,7 @@ const CollectionListPage = () => {
     const [collections, setCollections] = useState<ICollection[]>([]);
     const[collectionCount,setCollectionCount]=useState<number>(0);
    const [currentPageNo, setCurrentPageNo] = useState<number>(1);
-   const [pageSize, setPageSize] = useState<number>(10);
+   const [pageSize] = useState<number>(10);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [collectionId, setCollectionId] = useState<number | null>(null);

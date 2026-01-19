@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, Form, Select } from "antd"; //
 import {  useEffect, useState } from "react";
@@ -8,10 +9,10 @@ import { getVendors } from "../../services/vendor.service"; //
 
 const { Option } = Select; //
 
-const OrganizationComponent = () => {
+const OrganizationComponent = (_setOrganization:any ) => {
   const [categories, setCategories] = useState<any[]>([]); 
   const [collections, setCollections] = useState<any[]>([]); 
-const [vendors, setVendors] = useState<any[]>([]);
+  const [vendors, setVendors] = useState<any[]>([]);
   useEffect(() => {
     
     const fetchCategories = async () => {

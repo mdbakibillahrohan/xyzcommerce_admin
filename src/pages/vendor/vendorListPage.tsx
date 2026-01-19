@@ -11,10 +11,15 @@ import {
   Table,
   Typography,
   Popconfirm,
+  Tag,
   Tooltip,
-  type TableProps,
 } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  ShopOutlined,
+} from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import {
   createVendor,
@@ -22,32 +27,26 @@ import {
   getVendors,
   updateVendor,
 } from "../../services/vendor.service";
+import Avatar from "antd/es/avatar/Avatar";
 
-const { Title } = Typography;
-
-export interface IVendor {
-  vendor_id: number;
-  vendor_name: string;
-  vendor_description: string;
-}
+const { Title, Text } = Typography;
 
 const VendorListPage = () => {
   const [vendorForm] = Form.useForm();
-  const [vendors, setVendors] = useState<IVendor[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [submitLoading, setSubmitLoading] = useState<boolean>(false);
+  const [vendors, setVendors] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [vendorId, setVendorId] = useState<number | null>(null);
+  const [currentVendorId, setCurrentVendorId] = useState<number | null>(null);
 
-
+  
   const fetchVendors = async () => {
     setLoading(true);
     try {
       const response = await getVendors(null, 0, 100);
       setVendors(response.data?.vendors || []);
     } catch (error) {
-      notification.error({ message: "Failed to fetch vendors" });
+      notification.error({ message: "Failed to load vendors" });
     } finally {
       setLoading(false);
     }
@@ -57,82 +56,112 @@ const VendorListPage = () => {
     fetchVendors();
   }, []);
 
+  
   const handleDelete = async (id: number) => {
     try {
       await deleteVendorService(id);
       notification.success({ message: "Vendor deleted successfully" });
       fetchVendors();
     } catch (error) {
-      notification.error({ message: "Failed to delete vendor" });
+      notification.error({ message: "Delete failed" });
     }
   };
 
-
-  const handleEdit = (record: IVendor) => {
+ 
+ const handleEdit = (record: any) => {
     setIsEditing(true);
-    setVendorId(record.vendor_id);
-    vendorForm.setFieldsValue(record);
+    setCurrentVendorId(record.vendor_id);
+    //
+   vendorForm.setFieldsValue({
+      vendor_name: record.vendor_name,
+      vendor_address: record.vendor_address, 
+      description: record.description || record.description, 
+    });
     setIsModalOpen(true);
   };
 
+  //  (Create/Update)
   const onFinish = async (values: any) => {
-    setSubmitLoading(true);
     try {
-      if (isEditing && vendorId) {
-        await updateVendor(vendorId, values);
+      
+     const payload = {
+        vendor_name: values.vendor_name,
+        vendor_address: values.vendor_address || "",
+        description: values.description || "", 
+      };
+
+      if (isEditing && currentVendorId) {
+        await updateVendor(currentVendorId, payload);
         notification.success({ message: "Vendor updated successfully" });
       } else {
-        await createVendor(values);
+        await createVendor(payload);
         notification.success({ message: "Vendor created successfully" });
       }
       setIsModalOpen(false);
       vendorForm.resetFields();
       fetchVendors();
-    } catch (error) {
-      notification.error({ message: "Operation failed" });
-    } finally {
-      setSubmitLoading(false);
+    } catch (error: any) {
+    
+      notification.error({
+        message: "Operation Failed",
+        description: error.response?.data?.message || "Validation Error", 
+      });
     }
   };
 
-  const columns: TableProps<IVendor>["columns"] = [
+  const columns = [
     {
-      title: "Vendor Name",
-      dataIndex: "vendor_name",
+      title: "Vendor Details",
       key: "vendor_name",
-      render: (text) => <Typography.Text strong color="blue">{text}</Typography.Text>,
+
+      render: (record: any) => (
+        <Space>
+          <Avatar icon={<ShopOutlined />} style={{ backgroundColor: "#1677ff" }} />
+          <Space direction="vertical" size={0}>
+            <Text strong>{record.vendor_name}</Text>
+            <Tag color="blue">ID: {record.vendor_id}</Tag>
+          </Space>
+        </Space>
+      ),
+    },
+    {
+      title: "Address",
+      dataIndex: "vendor_address", 
+      key: "vendor_address",
+      render: (text: string) => text || "N/A",
     },
     {
       title: "Description",
-      dataIndex: "description",
-      key: "vendor_description",
-      ellipsis: true, 
+      dataIndex: "description", 
+      key: "description",
+      ellipsis: true,
     },
     {
       title: "Action",
       key: "action",
       width: 150,
-      align: 'center',
-      render: (_, record) => (
-        <Space size="middle">
+      align: "center" as const,
+      render: (record: any) => (
+        <Space>
           <Tooltip title="Edit">
             <Button
-              type="link"
+              type="primary"
+              ghost
               icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
             />
           </Tooltip>
-          <Tooltip title="Delete">
-            <Popconfirm
-              title="Are you sure to delete this vendor?"
-              onConfirm={() => handleDelete(record.vendor_id)}
-              okText="Yes"
-              cancelText="No"
-              okButtonProps={{ danger: true }}
-            >
-              <Button type="link" danger icon={<DeleteOutlined />} />
-            </Popconfirm>
-          </Tooltip>
+          <Popconfirm
+            title="Are you sure?"
+            onConfirm={() => handleDelete(record.vendor_id)}
+            okText="Yes"
+            cancelText="No"
+            okButtonProps={{ danger: true }}
+          >
+            <Tooltip title="Delete">
+              <Button danger icon={<DeleteOutlined />} />
+            </Tooltip>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -148,7 +177,6 @@ const VendorListPage = () => {
             icon={<PlusOutlined />}
             onClick={() => {
               setIsEditing(false);
-              setVendorId(null);
               vendorForm.resetFields();
               setIsModalOpen(true);
             }}
@@ -162,39 +190,34 @@ const VendorListPage = () => {
           dataSource={vendors}
           rowKey="vendor_id"
           loading={loading}
-          pagination={{ pageSize: 10 }}
           bordered
         />
       </Card>
 
-      <Modal
-        title={isEditing ? "Edit Vendor Details" : "Create New Vendor"}
-        open={isModalOpen} 
+     <Modal
+        title={isEditing ? "Edit Vendor" : "Create Vendor"}
+        open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onOk={() => vendorForm.submit()}
-        confirmLoading={submitLoading}
-        okText={isEditing ? "Update" : "Save"}
         destroyOnClose
       >
-        <Form
-          form={vendorForm}
-          layout="vertical"
-          onFinish={onFinish}
-          style={{ marginTop: 16 }}
-        >
+        <Form form={vendorForm} layout="vertical" onFinish={onFinish}>
           <Form.Item
             label="Vendor Name"
             name="vendor_name"
-            rules={[{ required: true, message: "Please enter vendor name" }]}
+            rules={[{ required: true, message: "Required" }]}
           >
             <Input placeholder="Enter vendor name" />
           </Form.Item>
 
-          <Form.Item
-            label="Vendor Description"
-            name="vendor_description"
-          >
-            <Input.TextArea rows={4} placeholder="Enter description (optional)" />
+        
+          <Form.Item label="Address" name="vendor_address">
+            <Input placeholder="Enter address" />
+          </Form.Item>
+
+        
+          <Form.Item label="Description" name="description">
+            <Input.TextArea rows={4} placeholder="Enter description" />
           </Form.Item>
         </Form>
       </Modal>
