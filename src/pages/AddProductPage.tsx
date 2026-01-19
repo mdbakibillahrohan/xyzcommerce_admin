@@ -1,4 +1,3 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "antd"; // message যোগ করা হয়েছে এলার্ট দেখানোর জন্য
 import { CopyOutlined, EyeOutlined, SaveOutlined } from "@ant-design/icons"; // SaveOutlined আইকন
@@ -21,55 +20,54 @@ const AddProductPage = () => {
     currency: "BDT",
   });
   const [productInfo, setProductInfo] = useState({
-     name: '',
-      sku: '',
-       weight: '',
-        product_descriptions: '' });
+    name: "",
+    sku: "",
+    weight: "",
+    product_descriptions: "",
+  });
   const [organization, setOrganization] = useState({
-  vendor: null,
-  category: null,
-  collections: []
-});
+    vendor_id: null,
+    category_id: null,
+    collection_id: null,
+  });
 
   const navigate = useNavigate();
 
-const handleSave = async () => {
+  const handleSave = async () => {
+    const finalData = {
+      productInfo: {
+        name: productInfo.name,
+        sku: productInfo.sku,
+        weight: Number(productInfo.weight) || 0,
+        product_descriptions: productInfo.product_descriptions || "",
+      },
+      price: {
+        amount: Number(price.amount) || 0,
+        currency: price.currency || "BDT",
+      },
+      organization: {
+        vendor_id: Number(organization.vendor_id),
+        category_id: Number(organization.category_id),
+        collection_id: Number(organization.collection_id),
+      },
+      uploadedImagePath: uploadedImagePath || null,
+    };
 
-  const finalData = {
-    productInfo: {
-      name: productInfo.name,
-      sku: productInfo.sku,
-      weight: Number(productInfo.weight) || 0,  
-      product_descriptions: productInfo.product_descriptions || '',
-    },
-    price: {
-      amount: Number(price.amount) || 0,
-      currency: price.currency || "BDT",
-    },
-    organization: {
-      vendor: organization.vendor ? Number(organization.vendor) : null,
-      category: Number(organization.category), 
-      collections: organization.collections || []
-    },
-    uploadedImagePath: uploadedImagePath || null
-  };
+    try {
+      const response = await createProduct(finalData);
 
-  try {
-  
-    const response = await createProduct(finalData); 
-    
-    // backend a theke success data chek
-    if (response.data?.success || response.status === 201) {
-      message.success("Product saved successfully!");
-      navigate("/products");
+      // backend a theke success data chek
+      if (response.data?.success || response.status === 201) {
+        message.success("Product saved successfully!");
+        navigate("/products");
+      }
+    } catch (error: any) {
+      console.error("Save error details:", error.response?.data);
+      const errorMessage =
+        error.response?.data?.message || "Failed to save product";
+      message.error(errorMessage);
     }
-  } catch (error: any) {
-    
-    console.error("Save error details:", error.response?.data);
-    const errorMessage = error.response?.data?.message || "Failed to save product";
-    message.error(errorMessage);
-  }
-};
+  };
 
   return (
     <div className="m-2">
@@ -109,9 +107,9 @@ const handleSave = async () => {
       <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
         <div className="col-span-4 mt-3">
           <div>
-            <ProductInformationComponent 
-            productInfo={productInfo}
-            setProductInfo={setProductInfo}
+            <ProductInformationComponent
+              productInfo={productInfo}
+              setProductInfo={setProductInfo}
             />
           </div>
           <div className="mt-2">
@@ -131,9 +129,8 @@ const handleSave = async () => {
           </div>
           <div className="pt-3.5">
             <OrganizationComponent
-             organization={organization}
-             setOrganization={setOrganization}
-             
+              organization={organization}
+              setOrganization={setOrganization}
             />
           </div>
         </div>

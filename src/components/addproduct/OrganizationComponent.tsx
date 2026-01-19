@@ -9,7 +9,16 @@ import { getVendors } from "../../services/vendor.service"; //
 
 const { Option } = Select; //
 
-const OrganizationComponent = (_setOrganization:any ) => {
+interface OrganizationComponentProps {
+  setOrganization: (org: any) => void;
+  organization: {
+    vendor_id: number | null;
+    category_id: number | null;
+    collection_id: number | null;
+  };
+}
+
+const OrganizationComponent = ({setOrganization, organization}:OrganizationComponentProps ) => {
   const [categories, setCategories] = useState<any[]>([]); 
   const [collections, setCollections] = useState<any[]>([]); 
   const [vendors, setVendors] = useState<any[]>([]);
@@ -59,7 +68,12 @@ const OrganizationComponent = (_setOrganization:any ) => {
         <h3 style={{ marginBottom: '24px', marginTop: 0, fontWeight: 600 }}>Organization</h3>
         <Form layout="vertical">
           <Form.Item label="Vendor">
-            <Select placeholder="Select vendor">
+            <Select onChange={(e)=>{
+              setOrganization((prev:any)=>({
+                ...prev,
+                vendor_id: e
+              }))
+            }} value={organization.vendor_id} placeholder="Select vendor">
               {vendors.map((vendor: any) => (
                 <Option key={vendor.vendor_id} value={vendor.vendor_id}>
                   {vendor.vendor_name}
@@ -69,7 +83,12 @@ const OrganizationComponent = (_setOrganization:any ) => {
           </Form.Item>
 
           <Form.Item label="Category">
-            <Select placeholder="Select category">
+            <Select onChange={(e)=>{
+              setOrganization((prev:any)=>({
+                ...prev,
+                category_id: e
+              }))
+            }} value={organization.category_id} placeholder="Select category">
               {categories.map((cat: any) => (
                 <Option key={cat.category_id} value={cat.category_id}>
                   {cat.category_name}
@@ -79,7 +98,12 @@ const OrganizationComponent = (_setOrganization:any ) => {
           </Form.Item>
 
           <Form.Item label="Collections">
-            <Select placeholder="Select collections">
+            <Select onChange={(e)=>{
+              setOrganization((prev:any)=>({
+                ...prev,
+                collection_id: e
+              }))
+            }} value={organization.collection_id} placeholder="Select collections">
               {collections.map((col: any) => (
                 <Option key={col.collection_id} value={col.collection_id}>
                   {col.collection_name}
