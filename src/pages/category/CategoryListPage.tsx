@@ -1,4 +1,5 @@
- 
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Button,
@@ -10,10 +11,15 @@ import {
   notification,
   Space,
   Table,
+  Typography,
+  Divider,
   type TableProps,
 } from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { createCategory, deleteCategoryService, getCategories, updateCategory } from "../../services/category.service";
+
+const { Title, Text } = Typography;
 
 export interface ICategory {
   category_id: number;
@@ -22,110 +28,115 @@ export interface ICategory {
 }
 
 const CategoryListPage = () => {
-  const columns: TableProps<ICategory>["columns"] = [
-    {
-      title: "Name",
-      dataIndex: "category_name",
-      key: "category_name",
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Description",
-      dataIndex: "category_descriptions",
-      key: "category_descriptions",
-    },
-
-    {
-      title: "Action",
-      key: "action",
-      render: (_:any, record) => (
-        <Space size="middle">
-          <Button onClick={()=>{
-            categoryForm.setFieldsValue(record)
-            setCategoryId(record?.category_id)
-            setIsEditing(true);
-            setIsModalOpen(true);
-          }} type="link">Edit</Button>
-          <Button onClick={()=>{
-            Modal.confirm({
-              title: "Are you sure you want to delete?",
-              okText: "Yes",
-              onOk: ()=>{
-                const showDeletingStatus = message.loading("Deleting....");
-                deleteCategoryService(record.category_id).then(()=>{
-                  fetchCategories();
-                }).catch(()=>{
-                  message.error("Something went wrong");
-                }).finally(()=>{
-                  showDeletingStatus();
-                })
-              }
-            })
-          }} type="link" danger>
-            Delete
-          </Button>
-        </Space>
-      ),
-    },
-  ];
   const [categoryForm] = Form.useForm();
   const [data, setData] = useState<ICategory[]>([]);
   const [categoryCount, setCategoryCount] = useState<number>(0);
   const [currentPageNo, setCurrentPageNo] = useState<number>(1);
   const [pageSize, setCurrentPageSize] = useState<number>(10);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [categoryId, setCategoryId] = useState<number|null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
 
-  //category form handlers
+  const columns: TableProps<ICategory>["columns"] = [
+    {
+      title: "Category Name",
+      dataIndex: "category_name",
+      key: "category_name",
+      render: (text) => <Text strong style={{ color: '#1890ff' }}>{text}</Text>,
+    },
+    {
+      title: "Description",
+      dataIndex: "category_descriptions",
+      key: "category_descriptions",
+      render: (text) => <Text type="secondary">{text || "No description provided"}</Text>,
+    },
+    {
+      title: "Action",
+      key: "action",
+      align: "right", // Aligning actions to the right is standard in modern dashboards
+      width: 150,
+      render: (_: any, record) => (
+        <Space size="small">
+          <Button 
+            type="text" 
+            icon={<EditOutlined />} 
+            onClick={() => {
+              categoryForm.setFieldsValue(record);
+              setCategoryId(record?.category_id);
+              setIsEditing(true);
+              setIsModalOpen(true);
+            }}
+          >
+            Edit
+          </Button>
+          <Button 
+            type="text" 
+            danger 
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              Modal.confirm({
+                title: "Delete Category",
+                content: `Are you sure you want to delete "${record.category_name}"? This action cannot be undone.`,
+                okText: "Delete",
+                okType: "danger",
+                cancelText: "Cancel",
+                onOk: () => {
+                  const showDeletingStatus = message.loading("Deleting....");
+                  deleteCategoryService(record.category_id).then(() => {
+                    fetchCategories();
+                  }).catch(() => {
+                    message.error("Something went wrong");
+                  }).finally(() => {
+                    showDeletingStatus();
+                  });
+                }
+              });
+            }}
+          >
+            Delete
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
   const onCategoryFormSubmit = (values: any) => {
+    const showMessageCreateOrUpdate = message.loading(isEditing ? "Updating...." : "Creating.....");
 
-    const showMessageCreateOrUpdate = message.loading(isEditing?"Updating....":"Creating.....");
-
-    if(isEditing){
-      updateCategory(categoryId, values).then((response)=>{
-        console.log(response);
-        notification.success({
-          message: "Successfully update the category"
-        })
+    if (isEditing) {
+      updateCategory(categoryId, values).then((_response) => {
+        notification.success({ message: "Category updated successfully" });
         fetchCategories();
-        setIsModalOpen(false);
-      }).catch((err:any)=>{
-        console.log(err);
+        closeModal();
+      }).catch((_err: any) => {
         message.error("Something went wrong");
-      }).finally(()=>{
+      }).finally(() => {
         showMessageCreateOrUpdate();
-      })
-
+      });
       return;
     }
 
     createCategory(values)
-      .then((response) => {
-        console.log(response);
+      .then((_response) => {
         notification.success({
           message: "Success",
           description: "Category created successfully",
         });
-        categoryForm.resetFields();
         fetchCategories();
-        setIsModalOpen(false);
+        closeModal();
       })
       .catch((error) => {
         console.error("Error creating category:", error);
-      }).finally(()=>{
+      }).finally(() => {
         showMessageCreateOrUpdate();
       });
-  }
-
-  //Modal Handlers
-  const handleOk = () => {
-    setIsModalOpen(false);
   };
 
-  const handleCancel = () => {
+  const closeModal = () => {
     setIsModalOpen(false);
+    setIsEditing(false);
+    setCategoryId(null);
+    categoryForm.resetFields();
   };
 
   const fetchCategories = async () => {
@@ -141,74 +152,89 @@ const CategoryListPage = () => {
 
   useEffect(() => {
     fetchCategories();
-  }, [currentPageNo]);
+  }, [currentPageNo, pageSize]);
 
   return (
-    <div>
-      <Card
-        title="Categories"
-        className="mb-4"
-        extra={
-          <Button onClick={() => setIsModalOpen(true)}>Add Category</Button>
-        }
-      >
+    <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
+      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <Title level={2} style={{ marginBottom: 0 }}>Product Categories</Title>
+          <Text type="secondary">Manage your product hierarchy and classifications</Text>
+        </div>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          size="large"
+          onClick={() => {
+            setIsEditing(false);
+            setIsModalOpen(true);
+          }}
+        >
+          Add Category
+        </Button>
+      </div>
+
+      <Card bordered={false} style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)' }}>
         <Table 
-        rowKey="category_id" 
-        columns={columns} 
-        dataSource={data} 
-        pagination={{
-          pageSize: pageSize,
-          total: categoryCount,
-          onChange: (pageNo)=>{
-            setCurrentPageNo(pageNo)
-          },
-          onShowSizeChange: (pageSizeFromParam)=>{
-            setCurrentPageSize(pageSizeFromParam)
-          }
-        }}
-         />
-        
+          rowKey="category_id" 
+          columns={columns} 
+          dataSource={data} 
+          pagination={{
+            current: currentPageNo,
+            pageSize: pageSize,
+            total: categoryCount,
+            showSizeChanger: true,
+            onChange: (page, size) => {
+              setCurrentPageNo(page);
+              setCurrentPageSize(size);
+            },
+          }}
+        />
       </Card>
 
-      {/* Add and edit category modal */}
       <Modal
-        title={isEditing?"Edit Category":"Add Category"}
-        closable={{ "aria-label": "Custom Close Button" }}
+        title={isEditing ? "Update Category" : "Create New Category"}
         open={isModalOpen}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={700}
+        onCancel={closeModal}
+        destroyOnClose
         footer={null}
+        width={500}
       >
+        <Divider style={{ marginTop: 10 }} />
         <Form
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
+          layout="vertical" // Professional dashboards usually use vertical labels
           form={categoryForm}
-          name="control-hooks"
           onFinish={onCategoryFormSubmit}
-          style={{ maxWidth: 600 }}
+          requiredMark="optional"
         >
           <Form.Item
             name="category_name"
-            label="Category Name"
-            rules={[{ required: true }]}
+            label={<Text strong>Category Name</Text>}
+            rules={[{ required: true, message: 'Please enter category name' }]}
           >
-            <Input />
+            <Input placeholder="e.g. Electronics" size="large" />
           </Form.Item>
 
           <Form.Item
             name="category_descriptions"
-            label="Category Description"
-            rules={[{ required: false }]}
+            label={<Text strong>Description</Text>}
           >
-            <Input.TextArea />
+            <Input.TextArea 
+              rows={4} 
+              placeholder="Enter a brief description of this category..." 
+            />
           </Form.Item>
-          <div className="flex justify-end items-center gap-3">
-            <Button type="primary" htmlType="submit">
-              Save
-            </Button>
-            <Button onClick={()=>{categoryForm.resetFields()}} htmlType="button">Reset</Button>
-          </div>
+
+          <Form.Item style={{ marginBottom: 0, marginTop: 24 }}>
+            <div style={{ display: 'flex', justifyContent: 'end', gap: '8px' }}>
+              <Button onClick={closeModal}>
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit" size="large">
+                {isEditing ? "Update Category" : "Create Category"}
+              </Button>
+            </div>
+          </Form.Item>
         </Form>
       </Modal>
     </div>

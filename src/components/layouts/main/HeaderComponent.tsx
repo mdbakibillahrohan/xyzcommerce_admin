@@ -1,95 +1,173 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Dropdown, Input, message, Space, type MenuProps } from "antd";
-import { Header } from "antd/es/layout/layout";
-import {MenuFoldOutlined, MenuUnfoldOutlined, SettingOutlined, UserOutlined} from "@ant-design/icons";
-import { logoutUser } from "../../../services/auth.service";
-import { useNavigate } from "react-router";
+import React from 'react';
+import {
+  Button,
+  Dropdown,
+  Input,
+  message,
+  Space,
+  Avatar,
+  Badge,
+  type MenuProps,
+} from 'antd';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  LogoutOutlined,
+  UserOutlined,
+  SettingOutlined,
+  BellOutlined,
+} from '@ant-design/icons';
+import { Header } from 'antd/es/layout/layout';
+import { useNavigate } from 'react-router';
+import { logoutUser } from '../../../services/auth.service';
 
-const HeaderComponent = ({userData, setCollapsed, collapsed}:any) => {
-    const navigate=useNavigate();
-    const dropdownItems: MenuProps["items"] = [
+interface HeaderProps {
+  collapsed: boolean;
+  setCollapsed: (v: boolean) => void;
+  userData: { username?: string; avatarUrl?: string; email?: string } | null;
+  isMobile?: boolean;           // ← pass from layout
+}
+
+const HeaderComponent: React.FC<HeaderProps> = ({
+  collapsed,
+  setCollapsed,
+  userData,
+  isMobile = false,
+}) => {
+  const navigate = useNavigate();
+
+  const items: MenuProps['items'] = [
     {
-      key: "my-account",
-      label: "My Account",
-      disabled: true,
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: 'Profile',
     },
     {
-      type: "divider",
-    },
-    {
-      key: "profile",
-      label: "Profile",
-      extra: "⌘P",
-    },
-    {
-      key: "billing",
-      label: "Billing",
-      extra: "⌘B",
-    },
-    {
-      key: "settings",
-      label: "Settings",
+      key: 'settings',
       icon: <SettingOutlined />,
-      extra: "⌘S",
+      label: 'Settings',
     },
+    { type: 'divider' },
     {
-      type: "divider",
-    },
-    {
-      key: "logout",
-      label: "Logout",
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Log out',
+      danger: true,
     },
   ];
 
-  const handleUserDropdownMenuClick = ({ key }: { key: string }) => {
-    if(key==="logout"){
-      // Implement logout functionality here
-      const isLoggedOut = logoutUser();
-      if (isLoggedOut) {
-        navigate("/login");
-      }else{
-        console.error("Logout failed");
-        message.error("Logout failed. Please try again.");
+  const onClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'logout') {
+      try {
+        const success = logoutUser();
+        if (success) {
+          message.success('Logged out successfully');
+          navigate('/login', { replace: true });
+        } else {
+          throw new Error();
+        }
+      } catch {
+        message.error('Logout failed');
       }
     }
-
+    // → add profile / settings navigation later
   };
-  return <Header style={{ padding: 0, background: "#fff" }}>
-          {/* You can add header content here if needed */}
-          <div className="flex justify-between items-center h-16">
-            <div>
-              <Button
-                onClick={() => {
-                  setCollapsed(!collapsed);
-                }}
-                type="text"
-                icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-              />
-            </div>
-            <div>
-              <Input.Search placeholder="Search..." style={{ width: 400 }} />
-            </div>
-            <div>
-              <Dropdown
-                menu={{ items: dropdownItems, onClick: handleUserDropdownMenuClick }}
-                placement="bottom"
-                arrow
-                trigger={["click"]}
+
+  const displayName =
+    userData?.username ||
+    userData?.email?.split('@')[0] ||
+    'Admin';
+
+  const avatarLetter = displayName[0]?.toUpperCase() ?? '?';
+
+  return (
+    <Header
+      style={{
+        padding: '0 16px 0 0',           // asymmetric – more space on right
+        background: '#fff',
+        borderBottom: '1px solid #f0f0f0',
+        boxShadow: '0 1px 4px rgba(0,21,41,0.08)', // subtle modern shadow
+        height: 64,
+        lineHeight: '64px',
+        zIndex: 10,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: '100%',
+          padding: '0 16px',
+        }}
+      >
+        {/* Left – collapse toggle (hidden on mobile) */}
+        {!isMobile && (
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            style={{ fontSize: 18 }}
+          />
+        )}
+
+        {/* Center – flexible search */}
+        <div style={{ flex: 1, maxWidth: 560, margin: '0 24px' }}>
+          <Input.Search
+            placeholder="Search products, orders, customers…  /"
+            allowClear
+            enterButton={false}
+            style={{ width: '100%' }}
+            onSearch={(v) => {
+              if (v.trim()) navigate(`/search?q=${encodeURIComponent(v)}`);
+            }}
+          />
+        </div>
+
+        {/* Right – actions */}
+        <Space size={24} align="center">
+          {/* Notifications (placeholder) */}
+          <Badge count={3} size="small">
+            <Button type="text" icon={<BellOutlined />} />
+          </Badge>
+
+          <Dropdown
+            menu={{ items, onClick }}
+            placement="bottomRight"
+            arrow
+            trigger={['click']}
+          >
+            <button
+              type="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <Avatar
+                size={40}
+                style={{ backgroundColor: '#1677ff' }}
+                src={userData?.avatarUrl}
               >
-                <a onClick={(e) => e.preventDefault()}>
-                  <Space>
-                    <span className="mr-4">
-                      {userData?.username || "Admin User"}
-                    </span>
-                    <UserOutlined
-                      style={{ fontSize: "20px", marginRight: "16px" }}
-                    />
-                  </Space>
-                </a>
-              </Dropdown>
-            </div>
-          </div>
-        </Header>;
-}
+                {!userData?.avatarUrl && avatarLetter}
+              </Avatar>
+
+              {!isMobile && (
+                <span style={{ fontWeight: 500, color: '#1f2937' }}>
+                  {displayName}
+                </span>
+              )}
+            </button>
+          </Dropdown>
+        </Space>
+      </div>
+    </Header>
+  );
+};
 
 export default HeaderComponent;

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, Form, Select } from "antd"; //
 import {  useEffect, useState } from "react";
@@ -15,6 +15,7 @@ interface OrganizationComponentProps {
     vendor_id: number | null;
     category_id: number | null;
     collection_id: number | null;
+    
   };
 }
 
