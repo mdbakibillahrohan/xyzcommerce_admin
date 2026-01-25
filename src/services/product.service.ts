@@ -6,5 +6,5 @@ export const createProduct = async (productData: any) => {
 }
 
 export const getProducts = async () => {
-    return await http.get("master/products");
+    return await http.get("master/products?filter=unpublished");
 }
