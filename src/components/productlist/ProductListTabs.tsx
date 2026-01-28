@@ -1,10 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Tabs, Badge, theme, Space } from "antd";
 
-const ProductListTabs = () => {
+interface ProductListTabsProps {
+  activeTab: string;
+  onChange: (key: string) => void;
+}
+
+const ProductListTabs = ({ activeTab, onChange }: ProductListTabsProps) => {
   const { token } = theme.useToken();
 
-  // Mock data for counts - in a real app, these would come from props/state
+  // Mock data - এটি পরে ডায়নামিক করা যাবে
   const counts = {
     all: 120,
     archived: 12,
@@ -34,47 +39,45 @@ const ProductListTabs = () => {
   return (
     <div
       style={{
-        marginBottom: 24,
+        marginBottom: 16, 
         padding: "4px",
         background: token.colorFillQuaternary,
-        borderRadius: 10, // Industrial rounded track
+        borderRadius: 10,
         display: "inline-block",
       }}
     >
       <Tabs
-        defaultActiveKey="1"
+        activeKey={activeTab} 
+        onChange={onChange}   
         type="card"
         tabBarStyle={{
           marginBottom: 0,
           borderBottom: "none",
         }}
-        // Custom CSS overrides via style prop for that "Pill" look
         items={[
           { 
-            key: "1", 
+            key: "all", 
             label: renderLabel("All products", counts.all) 
           },
           { 
-            key: "2", 
+            key: "published", 
             label: renderLabel("Published", counts.published) 
           },
           { 
-            key: "3", 
+            key: "unpublished", 
             label: renderLabel("Unpublished", counts.unpublished) 
           },
           { 
-            key: "4", 
+            key: "archived", 
             label: renderLabel("Archived", counts.archived) 
           },
         ]}
         style={{
-          // Customizing the Ant Design Card Tabs to look like Segmented buttons
           "--antd-wave-shadow-color": "transparent",
         } as any}
       />
 
       <style dangerouslySetInnerHTML={{ __html: `
-        /* Removing the default Ant Design borders and adding the industrial pill look */
         .ant-tabs-card .ant-tabs-tab {
           background: transparent !important;
           border: none !important;

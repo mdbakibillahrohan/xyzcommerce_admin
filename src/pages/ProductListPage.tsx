@@ -4,7 +4,7 @@ import ProductListTabs from "../components/productlist/ProductListTabs";
 import ProductListToolbar from "../components/productlist/ProductListToolbar";
 import ProductListTable from "../components/productlist/ProductListTable";
 import ProductListHeader from "../components/productlist/ProductListHeader";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getProducts } from "../services/product.service";
 
 const { Text } = Typography;
@@ -13,22 +13,37 @@ const ProductsPage = () => {
   const { token } = theme.useToken();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+
+  const fetchProducts = useCallback(async (status?: string) => {
+    setLoading(true);
+    try {
+      const statusParam = activeTab === 'all' ? undefined : activeTab;
+      const response = await getProducts(activeTab === 'all' ? undefined : activeTab);
+      const productData = response.data?.products || response.data?.data || response.data || [];
+      setProducts(productData);
+    } catch (error) {
+      console.error("Error loading products:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const response = await getProducts();
-        const productData = response.data?.products || response.data?.data || response.data || [];
-        setProducts(productData);
-      } catch (error) {
-        console.error("Error loading products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // const fetchProducts = async () => {
+    //   setLoading(true);
+    //   try {
+    //     const response = await getProducts();
+    //     const productData = response.data?.products || response.data?.data || response.data || [];
+    //     setProducts(productData);
+    //   } catch (error) {
+    //     console.error("Error loading products:", error);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   return (
     <ConfigProvider
@@ -67,7 +82,7 @@ const ProductsPage = () => {
               borderBottom: `1px solid ${token.colorBorderSecondary}`,
               background: '#ffffff'
             }}>
-              <ProductListTabs />
+              <ProductListTabs activeTab={activeTab} onChange={(key: string) => setActiveTab(key)} />
             </div>
 
            
@@ -78,12 +93,12 @@ const ProductsPage = () => {
               <ProductListToolbar />
             </div>
 
-            {/* টেবিল সেকশন */}
+            
             <div className="product-table-wrapper">
-              <ProductListTable dataSource={products} loading={loading} />
+              <ProductListTable dataSource={products} loading={loading} refreshData={fetchProducts} />
             </div>
 
-            {/* ফুটার স্ট্যাটাস বার */}
+            
             <div style={{ 
               padding: '10px 24px', 
               background: token.colorFillAlter,
