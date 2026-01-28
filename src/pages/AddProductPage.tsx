@@ -34,7 +34,6 @@ const AddProductPage = () => {
     name: "",
     sku: "",
     weight: "",
-    product_descriptions: "",
   });
 
   const [organization, setOrganization] = useState({
