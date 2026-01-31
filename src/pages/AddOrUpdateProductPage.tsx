@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Breadcrumb, Divider, Space, message, ConfigProvider } from "antd";
 import { CopyOutlined, EyeOutlined, SaveOutlined, ArrowLeftOutlined, ShakeOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
-import { useState } from "react";
-import { createProduct } from "../services/product.service";
+import { useNavigate, useParams } from "react-router";
+import { useEffect, useState } from "react";
+import { createProduct, getProductByIdService } from "../services/product.service";
 
 // Components
 import ProductInformationComponent from "../components/addproduct/ProductInformationComponent";
@@ -13,11 +14,34 @@ import OrganizationComponent from "../components/addproduct/OrganizationComponen
 import MediaComponent from "../components/addproduct/MediaComponent";
 import VariantsComponent from "../components/addproduct/VariantsComponent";
 
-const AddProductPage = () => {
+const AddOrUpdateroductPage = () => {
   const [uploadedImagePath, setUploadedImagePath] = useState<string | null>(null);
   const [price, setPrice] = useState<any>({ amount: 0, currency: "BDT" });
   const [productInfo, setProductInfo] = useState({ name: "", sku: "", weight: "" });
   const [organization, setOrganization] = useState({ vendor_id: null, category_id: null, collection_id: null });
+
+  const [existingProductData, setExistingProductData] = useState<any>(null);
+
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+
+  const [editingProductId, setEditingProductId] = useState<number>(0);
+  
+  const params = useParams();
+
+  useEffect(()=>{
+    if(Number(params?.productId)>0){
+      setIsUpdating(true)
+      setEditingProductId(Number(params?.productId))
+    }
+  }, [params])
+
+  useEffect(()=>{
+    getProductByIdService(editingProductId).then((res)=>{
+      setExistingProductData(res.data.data);
+    }).catch((err)=>{
+      message.error(err.message);
+    })
+  }, [editingProductId])
 
   const navigate = useNavigate();
 
@@ -88,7 +112,8 @@ const AddProductPage = () => {
                 icon={<SaveOutlined />}
                 onClick={handleSave}
               >
-                Deploy Product
+                {isUpdating?"Update Product":"Deploy Product"}
+                
               </Button>
             </Space>
           </div>
@@ -219,4 +244,4 @@ const AddProductPage = () => {
   );
 };
 
-export default AddProductPage;
+export default AddOrUpdateroductPage;

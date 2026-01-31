@@ -4,7 +4,7 @@ import MainLayout from "./layout/MainLayout";
 import AuthGuardComponent from "./guards/AuthGuardComponent";
 import DashboardPage from "./pages/DashboardPage";
 import ProductListPage from "./pages/ProductListPage";
-import AddProductPage from "./pages/AddProductPage";
+import AddOrUpdateroductPage from "./pages/AddOrUpdateProductPage";
 import CategoryListPage from "./pages/category/CategoryListPage";
 import CollectionListPage from "./pages/collection/CollectionListPage";
 import VendorListPage from "./pages/vendor/vendorListPage";
@@ -30,8 +30,12 @@ const router = createBrowserRouter([
                         element: <ProductListPage />
                     },
                     {
-                        path: "add", 
-                        element: <AddProductPage /> 
+                        path: "add",    
+                        element: <AddOrUpdateroductPage /> 
+                    },
+                    {
+                        path: "edit/:productId",
+                        element: <AddOrUpdateroductPage/>
                     }
                 ]
             },

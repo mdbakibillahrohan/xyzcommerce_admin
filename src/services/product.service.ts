@@ -18,3 +18,7 @@ export const updateProduct = async (productId: string, productData: any) => {
 export const deleteProduct = async (productId: string) => {   
     return await http.delete(`/master/products/${productId}`);
 }   
+
+export const getProductByIdService = async(productId:number)=>{
+    return await http.get(`/master/products/${productId}`);
+}
