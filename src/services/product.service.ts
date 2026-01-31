@@ -10,3 +10,11 @@ export const getProducts = async (status?: string) => {
     const url = status ? `/master/products?status=${status}` : "/master/products";
     return await http.get(url);
 }
+
+export const updateProduct = async (productId: string, productData: any) => {   
+    return await http.put(`/master/products/${productId}`, productData);
+}
+
+export const deleteProduct = async (productId: string) => {   
+    return await http.delete(`/master/products/${productId}`);
+}   

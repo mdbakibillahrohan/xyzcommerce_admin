@@ -193,7 +193,7 @@ const MainLayout: React.FC = () => {
           border-left: 3px solid #6366f1 !important;
         }
 
-        .content-scroller { padding: 24px; overflow-y: auto; }
+        .content-scroller { padding: 0px; overflow-y: auto; }
 
         /* Content Canvas */
         .content-glass-canvas {
@@ -201,7 +201,7 @@ const MainLayout: React.FC = () => {
           backdrop-filter: blur(10px);
           border-radius: 28px;
           border: 1px solid rgba(255, 255, 255, 0.05);
-          padding: 30px;
+          padding: 10px;
           min-height: 85vh;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }

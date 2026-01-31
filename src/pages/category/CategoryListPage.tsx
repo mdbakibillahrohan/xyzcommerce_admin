@@ -102,8 +102,7 @@ const CategoryListPage = () => {
 
   const onCategoryFormSubmit = (values: any) => {
     const showMessageCreateOrUpdate = message.loading(isEditing ? "Updating...." : "Creating.....");
-
-    if (isEditing) {
+   if (isEditing) {
       updateCategory(categoryId, values).then((_response) => {
         notification.success({ message: "Category updated successfully" });
         fetchCategories();

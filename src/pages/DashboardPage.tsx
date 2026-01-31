@@ -83,8 +83,8 @@ const DashboardPage = () => {
         }
 
         /* Decorative Glows */
-        .bg-glow-1 { position: absolute; top: -10%; left: -10%; width: 400px; height: 400px; background: rgba(99, 102, 241, 0.05); filter: blur(100px); border-radius: 50%; }
-        .bg-glow-2 { position: absolute; bottom: -10%; right: -10%; width: 400px; height: 400px; background: rgba(236, 72, 153, 0.05); filter: blur(100px); border-radius: 50%; }
+         .bg-glow-1 { position: absolute; top: -10%; left: -10%; width: 400px; height: 400px; background: rgba(99, 102, 241, 0.05); filter: blur(100px); border-radius: 50%; }
+         .bg-glow-2 { position: absolute; bottom: -10%; right: -10%; width: 400px; height: 400px; background: rgba(236, 72, 153, 0.05); filter: blur(100px); border-radius: 50%; }
 
         .content-container { position: relative; z-index: 10; max-width: 1600px; margin: 0 auto; }
 

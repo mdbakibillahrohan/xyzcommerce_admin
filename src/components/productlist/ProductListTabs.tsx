@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Tabs, Badge, theme, Space } from "antd";
 
 interface ProductListTabsProps {
@@ -7,9 +7,8 @@ interface ProductListTabsProps {
 }
 
 const ProductListTabs = ({ activeTab, onChange }: ProductListTabsProps) => {
-  const { token } = theme.useToken();
+  theme.useToken();
 
-  // Mock data - এটি পরে ডায়নামিক করা যাবে
   const counts = {
     all: 120,
     archived: 12,
@@ -17,81 +16,104 @@ const ProductListTabs = ({ activeTab, onChange }: ProductListTabsProps) => {
     unpublished: 3,
   };
 
-  const renderLabel = (label: string, count: number) => (
-    <Space size={8}>
-      <span style={{ fontWeight: 500 }}>{label}</span>
+  const renderLabel = (label: string, count: number, key: string) => (
+    <Space size={12} className={`custom-tab-item ${activeTab === key ? 'is-active' : ''}`}>
+      <span className="tab-text">{label}</span>
       <Badge
         count={count}
         showZero
-        style={{
-          backgroundColor: token.colorFillSecondary,
-          color: token.colorTextTertiary,
-          boxShadow: "none",
-          fontSize: "11px",
-          height: "18px",
-          lineHeight: "18px",
-          minWidth: "24px",
-        }}
+        className="cyber-count-badge"
       />
     </Space>
   );
 
   return (
-    <div
-      style={{
-        marginBottom: 16, 
-        padding: "4px",
-        background: token.colorFillQuaternary,
-        borderRadius: 10,
-        display: "inline-block",
-      }}
-    >
+    <div className="tabs-outer-shell">
       <Tabs
         activeKey={activeTab} 
         onChange={onChange}   
-        type="card"
-        tabBarStyle={{
-          marginBottom: 0,
-          borderBottom: "none",
-        }}
+        animated={{ inkBar: true, tabPane: false }}
+        className="cyber-tabs-navigation"
         items={[
-          { 
-            key: "all", 
-            label: renderLabel("All products", counts.all) 
-          },
-          { 
-            key: "published", 
-            label: renderLabel("Published", counts.published) 
-          },
-          { 
-            key: "unpublished", 
-            label: renderLabel("Unpublished", counts.unpublished) 
-          },
-          { 
-            key: "archived", 
-            label: renderLabel("Archived", counts.archived) 
-          },
+          { key: "all", label: renderLabel("All Products", counts.all, "all") },
+          { key: "published", label: renderLabel("Published", counts.published, "published") },
+          { key: "unpublished", label: renderLabel("Unpublished", counts.unpublished, "unpublished") },
+          { key: "archived", label: renderLabel("Archived", counts.archived, "archived") },
         ]}
-        style={{
-          "--antd-wave-shadow-color": "transparent",
-        } as any}
       />
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .ant-tabs-card .ant-tabs-tab {
-          background: transparent !important;
-          border: none !important;
-          border-radius: 6px !important;
-          margin-left: 0 !important;
-          padding: 8px 16px !important;
-          transition: all 0.2s ease;
+        /* Shell Styling */
+        .tabs-outer-shell {
+          background: rgba(15, 23, 42, 0.4);
+          padding: 6px;
+          border-radius: 16px;
+          display: inline-block;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(10px);
+          margin-bottom: 24px;
         }
-        .ant-tabs-card .ant-tabs-tab-active {
-          background: #fff !important;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+
+        /* Basic Tab Removal */
+        .cyber-tabs-navigation .ant-tabs-nav::before { display: none !important; }
+        .cyber-tabs-navigation .ant-tabs-nav { margin-bottom: 0 !important; }
+
+        /* Custom Label Styling */
+        .custom-tab-item {
+          padding: 6px 16px;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          position: relative;
+          z-index: 2;
         }
-        .ant-tabs-nav::before {
-          display: none !important;
+
+        .tab-text {
+          color: #94a3b8;
+          font-weight: 600;
+          font-size: 13px;
+          letter-spacing: 0.3px;
+        }
+
+        .is-active .tab-text {
+          color: #fff !important;
+          text-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Badge Styling */
+        .cyber-count-badge .ant-scroll-number {
+          background: rgba(255, 255, 255, 0.05) !important;
+          color: #64748b !important;
+          box-shadow: none !important;
+          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px !important;
+        }
+
+        .is-active .cyber-count-badge .ant-scroll-number {
+          background: #6366f1 !important;
+          color: #fff !important;
+          border-color: #818cf8 !important;
+          box-shadow: 0 0 12px rgba(99, 102, 241, 0.4) !important;
+        }
+
+        /* Sliding Active Ink Bar */
+        .cyber-tabs-navigation .ant-tabs-ink-bar {
+          height: 100% !important;
+          background: rgba(99, 102, 241, 0.15) !important;
+          border: 1px solid rgba(99, 102, 241, 0.3);
+          border-radius: 12px !important;
+          z-index: 1;
+          box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Hover Interaction */
+        .ant-tabs-tab:hover .tab-text {
+          color: #cbd5e1;
+        }
+
+        /* Slide & Fade Animation */
+        .ant-tabs-tab {
+          margin: 0 4px !important;
+          padding: 0 !important;
         }
       `}} />
     </div>
